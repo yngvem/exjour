@@ -14,7 +14,6 @@ from git import Repo
 class Journal:
     def __init__(self, directory):
         self.repo = Repo(directory)
-        self.working_dir = Path(self.repo.working_dir)
     
     def log_experiment(self, name, hash_path):
         if len(self.repo.index.diff("HEAD")) != 0:
@@ -24,6 +23,8 @@ class Journal:
         changed_files = {diff.a_path for diff in self.repo.index.diff(None)}
         
         if len(untracked_files) == 0 and len(changed_files) == 0:
+            with open(hash_path, "w") as f:
+                f.write(self.repo.head.commit.hexsha)
             return
 
         self.repo.index.add(untracked_files | changed_files)
